@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace OrderingApp.WebApi.Domain.Migrations
 {
     /// <inheritdoc />
@@ -32,9 +34,10 @@ namespace OrderingApp.WebApi.Domain.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DatePlaced = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CustomerId1 = table.Column<int>(type: "int", nullable: false),
-                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CustomerId = table.Column<int>(type: "int", nullable: true),
                     Total = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Discount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalAfterDiscount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DateConfirmed = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DateCancelled = table.Column<DateTime>(type: "datetime2", nullable: true),
                     State = table.Column<int>(type: "int", nullable: false)
@@ -43,11 +46,10 @@ namespace OrderingApp.WebApi.Domain.Migrations
                 {
                     table.PrimaryKey("PK_Orders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Orders_Customers_CustomerId1",
-                        column: x => x.CustomerId1,
+                        name: "FK_Orders_Customers_CustomerId",
+                        column: x => x.CustomerId,
                         principalTable: "Customers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -57,7 +59,7 @@ namespace OrderingApp.WebApi.Domain.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Product = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Quantity = table.Column<double>(type: "float", nullable: false),
+                    Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
@@ -71,15 +73,25 @@ namespace OrderingApp.WebApi.Domain.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "Customers",
+                columns: new[] { "Id", "DateJoined", "Membership", "Name" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2025, 5, 21, 14, 6, 21, 850, DateTimeKind.Utc).AddTicks(9001), -1, "Andrew" },
+                    { 2, new DateTime(2024, 5, 11, 14, 6, 21, 850, DateTimeKind.Utc).AddTicks(9004), 2, "John" },
+                    { 3, new DateTime(2023, 5, 21, 14, 6, 21, 850, DateTimeKind.Utc).AddTicks(9021), 1, "Ali" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_OrderLines_OrderId",
                 table: "OrderLines",
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_CustomerId1",
+                name: "IX_Orders_CustomerId",
                 table: "Orders",
-                column: "CustomerId1");
+                column: "CustomerId");
         }
 
         /// <inheritdoc />

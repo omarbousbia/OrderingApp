@@ -43,6 +43,29 @@ namespace OrderingApp.WebApi.Domain.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Customers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DateJoined = new DateTime(2025, 5, 21, 14, 6, 21, 850, DateTimeKind.Utc).AddTicks(9001),
+                            Membership = -1,
+                            Name = "Andrew"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DateJoined = new DateTime(2024, 5, 11, 14, 6, 21, 850, DateTimeKind.Utc).AddTicks(9004),
+                            Membership = 2,
+                            Name = "John"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            DateJoined = new DateTime(2023, 5, 21, 14, 6, 21, 850, DateTimeKind.Utc).AddTicks(9021),
+                            Membership = 1,
+                            Name = "Ali"
+                        });
                 });
 
             modelBuilder.Entity("OrderingApp.WebApi.Domain.Models.Order", b =>
@@ -51,10 +74,7 @@ namespace OrderingApp.WebApi.Domain.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CustomerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("CustomerId1")
+                    b.Property<int?>("CustomerId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DateCancelled")
@@ -66,15 +86,21 @@ namespace OrderingApp.WebApi.Domain.Migrations
                     b.Property<DateTime>("DatePlaced")
                         .HasColumnType("datetime2");
 
+                    b.Property<decimal>("Discount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("State")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Total")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<decimal>("TotalAfterDiscount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId1");
+                    b.HasIndex("CustomerId");
 
                     b.ToTable("Orders");
                 });
@@ -92,8 +118,8 @@ namespace OrderingApp.WebApi.Domain.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("Quantity")
-                        .HasColumnType("float");
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(18,2)");
@@ -109,9 +135,7 @@ namespace OrderingApp.WebApi.Domain.Migrations
                 {
                     b.HasOne("OrderingApp.WebApi.Domain.Models.Customer", "Customer")
                         .WithMany()
-                        .HasForeignKey("CustomerId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CustomerId");
 
                     b.Navigation("Customer");
                 });

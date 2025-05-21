@@ -2,8 +2,8 @@
 {
     public enum OrderState
     {
+        Cancelled = -1,
         Draft = 0,
-        Confirmed = 1,
-        Cancelled = 2,
+        Delivered = 1,
     }
 }
