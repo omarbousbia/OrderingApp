@@ -1,4 +1,5 @@
-﻿using OrderingApp.WebApi.Application.Requests;
+﻿using Microsoft.Extensions.Logging;
+using OrderingApp.WebApi.Application.Requests;
 using OrderingApp.WebApi.Application.Response;
 using OrderingApp.WebApi.Application.Services.Discount.Rules;
 using OrderingApp.WebApi.Domain;

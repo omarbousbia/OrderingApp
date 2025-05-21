@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using OrderingApp.WebApi.Application.Requests;
 using OrderingApp.WebApi.Application.Response;
 using OrderingApp.WebApi.Domain;

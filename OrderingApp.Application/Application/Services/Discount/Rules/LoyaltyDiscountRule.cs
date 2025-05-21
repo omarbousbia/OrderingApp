@@ -1,20 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using OrderingApp.WebApi.Domain;
 using OrderingApp.WebApi.Domain.Models;
 
 namespace OrderingApp.WebApi.Application.Services.Discount.Rules
 {
-    public class MembershipDiscountRule : IDiscountRule
+    public class LoyaltyDiscountRule : IDiscountRule
     {
         private readonly ApplicationDbContext _dbContext;
-        private readonly ILogger<MembershipDiscountRule> _logger;
+        private readonly ILogger<LoyaltyDiscountRule> _logger;
 
-        public MembershipDiscountRule(ApplicationDbContext dbContext,
-                                      ILogger<MembershipDiscountRule> logger)
+        public LoyaltyDiscountRule(ApplicationDbContext dbContext,
+                                      ILogger<LoyaltyDiscountRule> logger)
         {
             this._dbContext = dbContext;
             this._logger = logger;
         }
+
         public bool ApplyDiscount(Order order, CancellationToken cancellationToken)
         {
             if (order.CustomerId is null)
@@ -29,28 +31,22 @@ namespace OrderingApp.WebApi.Application.Services.Discount.Rules
                 return false;
             }
 
-            switch (customer.Membership)
+            if (customer.DateJoined is null)
             {
-                case CustomerMembership.None:
-                    break;
-                case CustomerMembership.Bronze:
-                    order.Discount += order.Total * 0.02m; // 2% discount
-                    break;
-                case CustomerMembership.Silver:
-                    order.Discount += order.Total * 0.04m; // 4% discount
-                    break;
-                case CustomerMembership.Gold:
-                    order.Discount += order.Total * 0.07m; // 7% discount
-                    break;
-                default:
-                    break;
+                return false;
+            }
+            else
+            {
+                // give 1% discount for each year
+                var yearsSinceJoined = (DateTime.UtcNow - customer.DateJoined.Value).Days / 365;
+                order.Discount += order.Total * 0.01m * yearsSinceJoined;
             }
             return true;
         }
 
         public string GetDiscountRuleName()
         {
-            return "Membership discount";
+            return "Loyalty discount";
         }
     }
 }
